@@ -1,0 +1,3 @@
+config = {};
+config.CHANNEL = "test";
+
