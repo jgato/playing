@@ -19,7 +19,9 @@ connection.addListener('ready', function () {
 		  queue.bind( exchange = config.PUB_KEY, routing = config.TOPIC_TYPE); 
 		  
 		  console.log("Bind done it with the routing key " + config.TOPIC_TYPE);
-
+		  console.log("Pub key " + config.PUB_KEY);
+		  console.log("Sub Key " + config.SUB_KEY);
+		  console.log("Be aware about sharing the keys..");
 
 		  });
   	});

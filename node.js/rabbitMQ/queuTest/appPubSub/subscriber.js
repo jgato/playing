@@ -1,5 +1,4 @@
 var amqp = require('amqp');
-var sleep = require('sleep');
 require('./config');
 var publisher_connection = require('./brokerConnector');
 
