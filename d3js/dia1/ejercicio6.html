@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+        <title>El Quijote otra vez</title>
+        <script type="text/javascript" src="d3.v3.js"></script>
+        <style>
+            .blink {
+                animation: blink 1s steps(5, start) infinite;
+                -webkit-animation: blink 1s steps(5, start) infinite;
+            }
+            @keyframes blink {
+                to { visibility: hidden; }
+            }
+            @-webkit-keyframes blink {
+                to { visibility: hidden; }
+            }
+
+        </style>
+
+
+    </head>
+
+    <body>
+        <h1>El Quijote otra vez</h1>
+        <script src="../lib/d3.v3.min.js"></script>
+        <script type="text/javascript">
+            var quijoteTam = [
+                {
+                    texto: "En un lugar de la Mancha, de cuyo nombre no quiero acordarme, no ha mucho tiempo que vivía un hidalgo de los de lanza en astillero, adarga antigua, rocín flaco y galgo corredor.",
+                    tamanyo: "12px"
+                },
+                {
+                    texto: "Una olla de algo más vaca que carnero, salpicón las más noches, duelos y quebrantos los sábados, lentejas los viernes, algún palomino de añadidura los domingos, consumían las tres partes de su hacienda.",
+                    tamanyo: "15px"
+                },
+                {
+                    texto: " El resto della concluían sayo de velarte, calzas de velludo para las fiestas con sus pantuflos de lo mismo, los días de entre semana se honraba con su vellori de lo más fino.",
+                    tamanyo: "18px"
+                }
+            ];
+            // Insertar en una sola linea los tres parrafos con sus tres textos+tamaños de fuente correspondientes
+
+
+            d3.select("body").selectAll("p")
+            .data(quijoteTam)
+            .enter()
+            .append("p")
+            .style("font-size", function (d, i) {
+                return d.tamanyo;
+            })
+            .text(function (d, i) {
+                return d.texto;
+            })
+            .style("color", function (d, i) {
+                return '#' + (Math.random() * 0xFFFFFF << 0).toString(16);
+
+            })
+            .on("click", function(d){
+                var paragraph = d3.select(this);
+                paragraph.text("eyyy youuu, dont touch");
+                paragraph.attr("class", "blink");
+                paragraph.style("color", "yellow");
+                var oldTxt = d.texto;
+                setTimeout(function(){
+                    paragraph.text(oldTxt);    
+                    paragraph.attr("class", "");
+                    paragraph.style("color", "black");
+                },3000);
+
+            })
+            .transition().duration(3000)
+            .style("color", "#000000")
+            .style("font-size", "33px");
+        </script>
+    </body>
+
+</html>
