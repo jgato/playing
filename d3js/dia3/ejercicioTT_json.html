@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Ranking de Trending Topics</title>
+    <style>
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            margin: auto;
+            position: relative;
+            width: 960px;
+            background-color: #000;
+            font-weight: 200;
+        }
+        .tt {
+            font-family: "American Typewriter";
+            font-size: 20px;
+            fill: #FFF;
+            font-weight: 400;
+        }
+        h1 {
+            font-size: 40px;
+            font-weight: 200;
+            color: #FFC100;
+        }
+        a {
+            text-decoration: none;
+            color: #AAA;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .on {
+            color: #FFF;
+        }
+        .barras {
+            fill: red;
+        }
+    </style>
+    <script src="d3.v3.js"></script>
+</head>
+
+<body>
+    <h1>Trending Topics 2012</h1>
+    <div style="margin-top:50px;float:left;">
+        <a href="#" class="mes" id="enero" style="color:blue;">Enero</a>
+        <br>
+        <a href="#" class="mes" id="febrero" style="color:yellow;">Febrero</a>
+        <br>
+        <a href="#" class="mes" id="marzo" style="color:red;">Marzo</a>
+        <br>
+    </div>
+
+    <script>
+        // Geometria
+
+        var width = 900,
+            height = 500;
+        leftOffset = 100;
+        topOffset = 70;
+        rankingHeight = 300;
+        margin = 10;
+
+        var colors = {
+            "enero": "blue",
+            "febrero": "yellow",
+            "marzo": "red"
+        }
+
+         // Declaracion svg
+
+        var svg = d3.select("body").append("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .style("float", "left")
+            .append("g")
+            .attr("transform", "translate(" + (leftOffset) + "," + (topOffset) + ")");
+
+
+         // Leemos los datos desde un fichero JSON
+        d3.json("ttData.json", function (jsonData) {
+                console.log("DATA");
+                console.log(jsonData);
+
+                var ttData = jsonData;
+
+                // Seleccion de enero al entrar
+                d3.select("#enero").classed("on", true);
+                renderRanking(ttData['enero'], "enero");
+
+                // Callback que gestiona el click de cambio de mes
+                d3.selectAll(".mes").on("click", function () {
+                    d3.selectAll(".mes").classed("on", false);
+                    d3.select(this).classed("on", true);
+                    var month = d3.select(this).attr("id");
+                    renderRanking(ttData[month], month);
+                    return false;
+                });
+
+                // Pinta ranking de palabras
+                function renderRanking(data, month) {
+                    // Escala de posicionamiento y
+                    console.log(month);
+                    var yScale = d3.scale.linear()
+                        .domain([0, data.length])
+                        .range([0, rankingHeight]).clamp(true);
+
+                    var xScale = d3.scale.linear().domain([0, data.length]).range([margin, width - margin]).clamp(true);
+                    var hScale = d3.scale.linear().domain([d3.min(data, function (element) {
+                        return element.score
+                    }), d3.max(data, function (element) {
+                        return element.score
+                    })]).range([5, 500]).clamp(true);
+
+                    console.log("max ", d3.max(data, function (element) {
+                        return element.score
+                    }));
+                    // update, enter, exit
+                    var hashTags = svg.selectAll("rect").data(data, function (d, i) {
+                        return d.name
+                    });
+
+                    var hashTexts = svg.selectAll("text").data(data, function (d, i) {
+                        return d.name
+                    });
+
+                    hashTags.exit().remove();
+
+
+                    /*   hashTags.transition()
+                    .duration(2000)
+                    .attr("y", function (d, i) {
+                        return yScale(i);
+                    })
+                    .attr("x", function (d, i) {
+                        return width - 300;
+                    }).transition().each("end", function (d, i) {
+                                                console.log("month " + month + colors[month]);
+                        d3.select(this).style("fill", colors[month]);
+
+                    });
+*/
+
+                    hashTags.transition().duration(2000)
+                        .attr("x", function (d, i) {
+                            console.log("x " + xScale(i));
+                            return xScale(i);
+                        })
+                        .attr("y", function (d, i) {
+                            console.log("y " + hScale(d.score));
+                            return height / 2 - hScale(d.score);
+                        })
+                        .attr("width", function (d, i) {
+                            return ((width - 2 * margin) / data.length) / 2.0;
+                        })
+                        .attr("height", function (d, i) {
+                            console.log("height " + hScale(d.score));
+                            return hScale(d.score);
+                        }).attr("class", "barras");
+
+
+                    hashTags.enter().append("rect")
+                        .attr("x", function (d, i) {
+                            return xScale(i);
+                        })
+                        .attr("y", function (d, i) {
+                            return height / 2 - hScale(d.score);
+                        })
+                        .attr("width", function (d, i) {
+                            return ((width - 2 * margin) / data.length) / 2.0;
+                        })
+                        .attr("height", function (d, i) {
+                            return hScale(d.score);
+                        }).attr("class", "barras")
+                        .style("fill", colors[month]);
+
+                    hashTexts.enter().append("text")
+                        .attr("x", function (d, i) {
+                            return xScale(i) + 10;
+                        })
+                        .attr("y", function (d, i) {
+                            return height / 2 - hScale(d.score);
+                        })
+                        .text(function (d, i) {
+                            return d.name.substring(0,10);
+                        })
+                        .style("fill", "white")
+                        .attr("style", "fill: lightgreen; writing-mode: tb; glyph-orientation-vertical: 0");
+                //.attr("transform", "rotate(90)");
+            }
+        });
+    </script>
+
+</body>
+
+</html>
