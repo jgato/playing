@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">// AEON integration
+    <script type="text/javascript" src="aeonSDK.js"></script>
+    <script type="text/javascript" src="config.js"></script>
+    <script type="text/javascript" src="socket.io.js"></script>
+
+
+    <style>
+        /* Código CSS */
+        .subunit.ESP {
+            fill: #ddc;
+        }
+        .subunit.FRA,
+        .subunit.MAR,
+        .subunit.PRT {
+            display: none;
+        }
+        .subunit-boundary {
+            fill: none;
+            stroke: #777;
+            stroke-dasharray: 2, 2;
+            stroke-linejoin: round;
+        }
+        .subunit-boundary.OTHER {
+            stroke: #aaa;
+        }
+    </style>
+</head>
+
+<body>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="http://d3js.org/queue.v1.min.js"></script>
+    <script src="http://d3js.org/topojson.v1.min.js"></script>
+    <script>
+        /* Código JavaScript */
+        var width = 1200,
+            height = 700;
+        var svg = d3.select("body")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height).call(d3.behavior.zoom().on("zoom", redraw))
+            .append('g');;
+
+
+        function redraw() {
+            svg.attr("transform",
+                "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")");
+
+        }
+
+        queue().defer(d3.json, "json/es.json")
+            .defer(d3.tsv, "tsv/ine.tsv")
+            .await(ready);
+
+        function ready(error, es, ine) {
+            console.log(ine);
+
+            /* Todo el código que teníamos dentro de la llamada a d3.json */
+
+            var provincesData = {};
+            ine.forEach(function (d, i) {
+                Object.keys(d).forEach(function (k) {
+                    var v = parseFloat(d[k]);
+                    if (!isNaN(v)) {
+                        d[k] = v;
+                    }
+                });
+
+                provincesData[d.provincia] = d;
+            });
+
+            var colorScale = d3.scale
+                .linear()
+                .domain([
+d3.min(ine, function (d) {
+                        return d.population;
+                    }),
+d3.max(ine, function (d) {
+                        return d.population;
+                    }),
+])
+                .range(["#0000ff", "#ff0000"]);
+
+
+            var subunits = topojson.feature(es, es.objects.subunits),
+
+                projection = d3.geo.albers().center([0, 40.23])
+                .rotate([3.43, 0])
+                .parallels([40, 60])
+                .scale(4000)
+                .translate([width / 2, height / 2]),
+
+
+                path = d3.geo.path()
+                .projection(projection);
+
+            svg.selectAll(".subunit")
+                .data(subunits.features)
+                .enter()
+                .append("path")
+                .attr("class", function (d) {
+                    return "subunit " + d.id.slice(0, 3);
+                })
+                .attr("d", path)
+                .style("fill", function (d, i) {
+                    if (("properties" in d) && ("name" in d.properties)) {
+                        var province = d.properties.name;
+                        console.log(d);
+                        console.log(province);
+                        if (province in provincesData)
+                            return colorScale(provincesData[province].population);
+                        else
+                            return "none";
+                    } else
+                        return "none";
+                });
+
+            svg.append("path")
+                .datum(topojson.mesh(es, es.objects.subunits, function (a, b) {
+                    return a !== b && a.id.slice(0, 3) === "ESP";
+                }))
+                .attr("d", path)
+                .attr("class", "subunit-boundary");
+
+            svg.append("path")
+                .datum(topojson.mesh(es, es.objects.subunits, function (a, b) {
+                    return a === b && a.id.slice(0, 3) !== "ESP";
+                }))
+                .attr("d", path)
+                .attr("class", "subunit-boundary OTHER");
+
+            svg.append("path")
+                .datum(topojson.feature(es, es.objects.places))
+                .attr("d", path)
+                .attr("class", "place");
+            svg.selectAll(".place-label")
+                .data(topojson.feature(es, es.objects.places).features)
+                .enter()
+                .append("text")
+                .attr("class", "place-label")
+                .attr("transform", function (d) {
+                    return "translate(" + projection(d.geometry.coordinates) + ")";
+                })
+                .attr("dy", ".35em")
+                .text(function (d) {
+                    return d.properties.name;
+                });
+            svg.selectAll(".place-label")
+                .attr("x", function (d) {
+                    return d.geometry.coordinates[0] > -1 ? 6 : -6;
+                })
+                .style("text-anchor", function (d) {
+                    return d.geometry.coordinates[0] > -1 ? "start" :
+                        "end";
+                });
+
+
+            var sdk = new AeonSDK(SUB_URL, YOUR_ID, YOUR_DESC);
+
+            sdk.subscribe(function (received) {
+                // translate gps to relative positions in our figure
+                var coord = projection([received.longitude, received.latitude]);
+
+                svg.append("circle")
+                    .attr("cx", coord[0])
+                    .attr("cy", coord[1])
+                    .attr("r", 5);
+                
+            }, function (control) {
+                console.log(control)
+            });
+
+
+
+
+
+        };
+    </script>
+</body>
+
+</html>
