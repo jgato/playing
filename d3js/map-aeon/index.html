@@ -29,9 +29,6 @@
         .attr("width", width)
         .attr("height", height);
 
-    var svg = d3.select("body").append("svg")
-        .attr("width", width)
-        .attr("height", height);
 
     var c = canvas.node().getContext("2d");
 
@@ -79,7 +76,7 @@
                     .duration(1250)
                     .each("start", function () {
                         //title.text(countries[i = (i + 1) % n].name);
-                        //title.text("Message received");
+                        title.text("Message received");
                         i = (i + 1) % n;
                     })
                     .tween("rotate", function () {
@@ -90,9 +87,9 @@
                         return function (t) {
                             projection.rotate(r(t));
                             c.clearRect(0, 0, width, height);
-                            c.fillStyle = "#bbb", c.beginPath(), path(land), c.fill();
+                            c.fillStyle = "#77b4d6", c.beginPath(), path(land), c.fill();
                             //c.fillStyle = "#f00", c.beginPath(), path(countries[i]), c.fill();
-                            c.strokeStyle = "#fff", c.lineWidth = .5, c.beginPath(), path(borders), c.stroke();
+                            c.strokeStyle = "#255a75", c.lineWidth = .5, c.beginPath(), path(borders), c.stroke();
                             //c.strokeStyle = "#000", c.lineWidth = 2, c.beginPath(), path(globe), c.stroke();
                         };
                     })
@@ -101,13 +98,23 @@
                         console.log("finished");
                         c.beginPath();
                         c.arc(coord[0], coord[1], 5, 0, 2 * Math.PI, false);
-                        c.fillStyle = 'green';
+                        c.fillStyle = '#77b4d6';
                         c.fill();
                         c.lineWidth = 5;
-                        c.strokeStyle = '#003300';
+                        c.strokeStyle = '#255a75';
                         c.stroke();
 
+                        var imageObj = new Image();
+
+                        imageObj.onload = function() {
+                            c.drawImage(imageObj, coord[0]-17, coord[1]-30, 35, 30);
+                        };
+                        imageObj.src = 'http://maps.google.com/mapfiles/ms/icons/red-dot.png';
+         
+                        
                         //projection.center(coord);
+                        
+                        title.text("");
                     })
                     .transition();
 

@@ -26,7 +26,7 @@
 
 // config for subscribing
 
-var SUB_URL = "http://lcb.herokuapp.com/subscribe/769b1dc6-310f-46ec-a626-4c731a13f548";
+var SUB_URL = "http://lcb.herokuapp.com/subscribe/39dac395-6563-490d-b3cc-1b6e20a10b69";
 var YOUR_ID = "test-java-666";
 var YOUR_DESC = "test-java-666";
 
