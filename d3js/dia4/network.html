@@ -34,8 +34,8 @@
 
          // Inicialización del layout.
         var force = d3.layout.force()
-            .charge(-420) // Definimos una carga de -120
-            .linkDistance(100) // Definimos una longitud de arista de 40
+            .charge(-820) // Definimos una carga de -120
+            .linkDistance(200) // Definimos una longitud de arista de 40
             .size([width, height]);
 
 
@@ -52,7 +52,7 @@
         }
 
          // Carga del fichero de datos.
-        d3.json('./flocker_network.json', function (data) {
+        d3.json('../my_graph.json', function (data) {
 
             console.log(data);
 
@@ -119,15 +119,7 @@
                     return fontScale(d.weight);
                 });*/
 
-            node.enter().append("image").attr("xlink:href", function (d, i) {
-                console.log(d);
-                console.log(d.img);
-                if (d.img == "undefined") {
-                    return "";
-                } else {
-                    return d.img;
-                }
-            });
+
 
             // Cada vez que se recalculan posiciones, se produce un evento tick.
             // En este punto es donde podremos redibujar los nodos y las aristas.

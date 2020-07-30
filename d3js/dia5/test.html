@@ -163,11 +163,11 @@ d3.max(ine, function (d) {
             sdk.subscribe(function (received) {
                 // translate gps to relative positions in our figure
                 var coord = projection([received.longitude, received.latitude]);
-
+                console.log(coord);
                 svg.append("circle")
                     .attr("cx", coord[0])
                     .attr("cy", coord[1])
-                    .attr("r", 5);
+                    .attr("r", 50);
                 
             }, function (control) {
                 console.log(control)

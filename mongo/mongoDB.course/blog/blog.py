@@ -178,7 +178,7 @@ def post_newcomment():
             # you only update one document here by updating the one with the right permalink.
             
             posts.update (  { "permalink" : permalink },  { "$push" : { "comments" : comment } } )
-
+	    posts.save()
             # your update here.
             print "about to update a blog post with a comment"
             
