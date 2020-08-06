@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "estimator.fullname" . }}
+  labels:
+    {{- include "estimator.labels" . | nindent 4 }}
+spec:
+  type: NodePort
+  ports:
+    - name: prediction-engine
+      nodePort: {{ .Values.estimator.ESTIMATOR_PORT }}
+      port: 5005
+      protocol: TCP
+  selector:
+    {{- include "estimator.selectorLabels" . | nindent 4 }}

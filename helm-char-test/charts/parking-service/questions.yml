@@ -1,0 +1,154 @@
+labels:
+  io.cattle.role: cluster # options are cluster/project
+  io.rancher.app_min_version: 1.0.0
+categories:
+- trainer
+- estimator
+namespace: environment-1-services
+questions:
+### Service options
+- variable: global.TRAINING_EXPERIMENT_ID
+  default: ""
+  description: Training experiment ID, defaults to random 20 character string if not set. PLEASE REMIND THAT YOU WILL NOT BE ABLE TO RECOVER THIS ID IF NOT SET
+  label: Training experiment ID
+  type: string
+  group: Service options
+
+### Deployment options
+- variable: estimator.replicaCount
+  default: 1
+  description: "Number of replicas desired for the inferencer"
+  label: "Desired replicas"
+  type: int
+  group: Deployment options
+- variable: AVAILABLE_ARCHITECTURES
+  label: Available architectures
+  description: "Select the architectures you wish to use"
+  type: enum
+  options:
+    - x86 ARM
+    - x86 CPU
+    - GPU
+    - TPU
+    - More from Kubernetes cluster...
+  default: "GPU"
+  group: Deployment options
+
+### Data options
+- variable: DATA_INPUT_FEATURES
+  default: "*all*"
+  label: Input features
+  type: string
+  description: Input features for the model. *all* to allow feature selection, others separated by ';' to manually choose
+  group: Data options
+- variable: DATA_AREA_TO_TRAIN
+  default: "*all*"
+  type: string
+  label: Area to train
+  description: Area(s) to train. *all* to allow feature selection, others separated by ';' to manually choose (this deploys one trainer for each area selected)
+  group: Data options
+- variable: DATA_PERFORM_FEATURE_ANALYSIS
+  default: false
+  type: boolean
+  label: Perform feature analysis?
+  description: Outputs a file with an automatic feature analysis, that will be available on the minio storage system, as well as by mail
+  group: Data options
+
+### Data ingestion
+- variable: PERFORM_DATA_INGESTION
+  default: false
+  description: "Allows the user to perform data ingestion with our custom connectors"
+  label: Perform data ingestion?
+  type: boolean
+  group: Data Ingestion (optional)
+  show_subquestion_if: true
+  subquestions:
+    - variable: DATA_INGESTION_SOURCE_FORMAT
+      label: Source format
+      description: Source of the data
+      type: enum
+      options: 
+        - NGSI
+        - NGSI-LD
+        - NGSI-2
+        - csv
+        - json
+        - ...
+      default: NGSI
+    - variable: DATA_INGESTION_SOURCE_URL
+      label: Source URL
+      default: "context_broker.easier.ai"
+      description: Source URL to collect the historical data and subscribe to. (In case the source is not csv or json)
+      type: string
+    - variable: DATA_INGESTION_SOURCE_FILE
+      label: Source file
+      default: C:/Users/dataset.csv
+      description: Source file to collect the historical data
+      type: string
+    - variable: MORE_OPTIONS_DUMMY
+      label: More options
+      description: "Placeholder for more options as the data manager manager needs them"
+      default: ""
+      type: string
+
+### Model architectures
+- variable: USE_TRAINED_MODEL
+  default: false
+  description: "Allows choosing a pre-trained model from the EASIER.AI minio storage system"
+  label: Use available trained model?
+  type: boolean
+  group: Model architecture (optional)
+  show_subquestion_if: true
+  subquestions:
+    - variable: MINIO_PRETRAINED_PATH
+      label: Traning experiment id
+      description: Experiment id of the pretrained model in the minio storage system
+      type: enum
+      options: 
+        - jgato_experiment_0001
+        - lfh4mchs7864fmvhnmñja
+        - jgato_experiment_2371
+        - jgato_experiment_0981
+        - aaj285dhnldhakcn3973v
+        - jgato_experiment_0781
+      default: jgato_experiment_0001
+- variable: MODEL_USE_CUSTOM
+  default: false
+  label: Use custom model
+  description: Allows the design of a custom model by the user
+  group: Model architecture (optional)
+  type: boolean
+  show_subquestion_if: true
+  subquestions:
+    - variable: MODEL_ARCHITECTURE
+      label: Model design
+      description: "Desired model architecture in csv format -> id; layer_type(dense, lstm, dropout... https://keras.io/layers/about-keras-layers/); activation; units; input_shape; parent_id"
+      type: multiline
+      default: "1; dense; softmax; 32; (64, 3); 0 \n2; lstm; softmax; 1; ; 1" 
+    - variable: MODEL_LEARNING_RATE
+      label: Learning rate
+      description: Allows finetuning of learning rate hyperparameter
+      type: int
+      default: 0.03
+      group: Hyperparameter tuning
+    - variable: MODEL_OPTIMIZER
+      label: Optimizer
+      description: Allows choice of optimizer hyperparameter (https://keras.io/optimizers/)
+      type: enum
+      default: "SGD"
+      options: 
+        - SGD
+        - RMSprop
+        - Adagrad
+        - Adadelta
+        - ...
+    - variable: MODEL_LOSS
+      label: Loss
+      description: Allows finetuning of loss hyperparameter (https://keras.io/losses/)
+      type: enum
+      default: "categorical_crossentropy"
+      options:
+        - categorical_crossentropy
+        - binary_crossentropy
+        - poisson
+        - cosine_proximity

@@ -1,0 +1,26 @@
+apiVersion: v1
+entries:
+  parking-service:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2020-08-06T13:52:27.256442272+02:00"
+    dependencies:
+    - condition: trainer.enabled
+      name: trainer
+      repository: ""
+      version: 1.0.0
+    - name: estimator
+      repository: ""
+      version: 1.0.0
+    description: Chart.yml/description
+    digest: 3013472c617ad4f7fecc1ee342eb6f4445cd06c7a865cd4cd48b516f122d87b3
+    home: Chart.yml/home
+    icon: file://../atos_logo.png
+    name: parking-service
+    sources:
+    - http:Chart.yml/sources
+    type: application
+    urls:
+    - parking-service-0.0.1.tgz
+    version: 0.0.1
+generated: "2020-08-06T13:52:27.255125051+02:00"

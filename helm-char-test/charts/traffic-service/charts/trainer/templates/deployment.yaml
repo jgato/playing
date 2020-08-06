@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "trainer.fullname" . }}
+  labels:
+    {{- include "trainer.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "trainer.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "trainer.selectorLabels" . | nindent 8 }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      serviceAccountName: {{ include "trainer.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image }}:{{ .Values.global.imageTag }}"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          env: 
+            - name: TRAINING_RESULTS_ID
+              {{- if .Values.global.TRAINING_EXPERIMENT_ID}}
+              value: {{ .Values.global.TRAINING_EXPERIMENT_ID }}
+              {{- else }}
+              value: {{ randAlphaNum 20 | lower }}
+              {{- end }}
+            - name: TEST_VARIABLE
+              value: {{ .Values.TEST_VARIABLE }}
+            - name: MINIO_SERVICE_HOST
+              value: {{ .Values.global.MINIO_SERVICE_HOST }}
+            - name: MINIO_SERVICE_PORT
+              value: "{{ .Values.global.MINIO_SERVICE_PORT }}"
+            - name: ELASTIC_HOST
+              value: {{ .Values.global.ELASTIC_HOST }}
+            - name: ELASTIC_PORT
+              value: "{{ .Values.global.ELASTIC_PORT }}"
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: accesskey
+                  name: minio-credentials
+            - name: MINIO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: secretkey
+                  name: minio-credentials
+            - name: ELASTIC_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: elastic-credentials
+            - name: ELASTIC_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: username
+                  name: elastic-credentials
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      restartPolicy: Never
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}

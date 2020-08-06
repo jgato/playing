@@ -1,0 +1,6 @@
+dependencies: 
+- name: trainer
+  version: 1.0.0
+  condition: trainer.enabled
+- name: estimator
+  version: 1.0.0
