@@ -3,7 +3,7 @@ entries:
   parking-service:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2020-08-06T13:52:27.256442272+02:00"
+    created: "2020-08-06T13:57:28.474272619+02:00"
     dependencies:
     - condition: trainer.enabled
       name: trainer
@@ -13,7 +13,7 @@ entries:
       repository: ""
       version: 1.0.0
     description: Chart.yml/description
-    digest: 3013472c617ad4f7fecc1ee342eb6f4445cd06c7a865cd4cd48b516f122d87b3
+    digest: ffc7229afd03042c781e608a6e33d43456bda26cfe92d09922748a7baf1f19b7
     home: Chart.yml/home
     icon: file://../atos_logo.png
     name: parking-service
@@ -23,4 +23,4 @@ entries:
     urls:
     - parking-service-0.0.1.tgz
     version: 0.0.1
-generated: "2020-08-06T13:52:27.255125051+02:00"
+generated: "2020-08-06T13:57:28.472963209+02:00"
